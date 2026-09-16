@@ -51,12 +51,22 @@ export function AuthProvider({ children }) {
     return session
   }
 
+  async function resetPassword({ email, password }) {
+    const normalizedEmail = email.toLowerCase().trim()
+    const users = readStorage(USERS_KEY, [])
+    const accountIndex = users.findIndex((item) => item.email === normalizedEmail)
+    if (accountIndex < 0) throw new Error('No account stored on this device uses that email.')
+    const nextUsers = [...users]
+    nextUsers[accountIndex] = { ...nextUsers[accountIndex], passwordHash: await hashPassword(normalizedEmail, password) }
+    localStorage.setItem(USERS_KEY, JSON.stringify(nextUsers))
+  }
+
   function signOut() {
     localStorage.removeItem(SESSION_KEY)
     setUser(null)
   }
 
-  const value = useMemo(() => ({ user, signUp, signIn, signOut }), [user])
+  const value = useMemo(() => ({ user, signUp, signIn, signOut, resetPassword }), [user])
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
 

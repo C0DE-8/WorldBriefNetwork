@@ -53,6 +53,7 @@ export default function Auth({ mode }) {
         {createAccount && <label>Display name<input name="name" type="text" autoComplete="name" minLength="2" required placeholder="How readers will know you" /></label>}
         <label>Email address<input name="email" type="email" autoComplete="email" required placeholder="you@example.com" /></label>
         <label>Password<input name="password" type="password" autoComplete={createAccount ? 'new-password' : 'current-password'} minLength="8" required placeholder="At least 8 characters" /></label>
+        {!createAccount && <small className={s.switch}><Link to="/forgot-password">Forgot your password?</Link></small>}
         {error && <div className={s.error} role="alert">{error}</div>}
         <button className={s.submitButton} disabled={busy}>{busy ? 'One moment…' : createAccount ? 'Create account' : 'Sign in'} <Icon name="right" size={16} /></button>
       </form>
