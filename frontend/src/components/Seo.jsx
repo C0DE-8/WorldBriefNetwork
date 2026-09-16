@@ -55,9 +55,11 @@ function pageDetails(pathname, search) {
     '/trending': [`Trending News & Stories | ${SITE_NAME}`, 'The stories and ideas readers are following now, curated by WorldBriefNetwork.'],
     '/saved': [`Saved Stories | ${SITE_NAME}`, 'Your saved WorldBriefNetwork stories.'],
     '/search': [query ? `Search results for “${query}” | ${SITE_NAME}` : `Search | ${SITE_NAME}`, query ? `Search results for ${query} on ${SITE_NAME}.` : `Search news, ideas, and perspectives from ${SITE_NAME}.`],
+    '/login': [`Sign in | ${SITE_NAME}`, 'Sign in to your WorldBriefNetwork reader account.'],
+    '/signup': [`Join the conversation | ${SITE_NAME}`, 'Create a WorldBriefNetwork reader account to comment, reply, and save stories.'],
   }
   const [title, description] = pages[pathname] || [`Page not found | ${SITE_NAME}`, 'The requested page could not be found.']
-  return { title, description, type: 'website', noIndex: ['/saved', '/search'].includes(pathname) || !pages[pathname] }
+  return { title, description, type: 'website', noIndex: ['/saved', '/search', '/login', '/signup'].includes(pathname) || !pages[pathname] }
 }
 
 export default function Seo() {

@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
-import Newsletter from '../components/Newsletter'
-import Icon from '../components/Icon'
-import s from './Pages.module.css'
+import Newsletter from '../../components/Newsletter'
+import Icon from '../../components/Icon'
+import s from './Info.module.css'
 export default function Info({type}) {
  const [message,setMessage]=useState('')
  if(type==='newsletter')return <div className={s.info}><div className={s.eyebrow}>THE DAILY BRIEF</div><h1>Your world.<br/>A little clearer.</h1><p>Make space for a thoughtful start to your day. Our morning briefing brings together the ideas, stories, and perspectives worth your attention.</p><Newsletter wide/><p className={s.demoNote}>Newsletter preview: preferences are saved locally. Email delivery is not connected yet.</p></div>

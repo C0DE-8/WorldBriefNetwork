@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
-import { categories, stories } from '../data/stories'
-import StoryCard from '../components/StoryCard'
-import Icon from '../components/Icon'
-import s from './Pages.module.css'
+import { categories, stories } from '../../data/stories'
+import StoryCard from '../../components/StoryCard'
+import Icon from '../../components/Icon'
+import s from './Listing.module.css'
 export default function Listing({ type, saved, onSave }) {
  const {category}=useParams();const [params,setParams]=useSearchParams();const [sort,setSort]=useState('latest');const query=params.get('q')||''
  const categoryName=categories.find(c=>c.toLowerCase()===category)

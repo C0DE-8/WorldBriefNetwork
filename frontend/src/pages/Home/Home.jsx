@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { stories } from '../data/stories'
-import Icon from '../components/Icon'
-import StoryCard from '../components/StoryCard'
-import Newsletter from '../components/Newsletter'
-import s from './Pages.module.css'
+import { stories } from '../../data/stories'
+import Icon from '../../components/Icon'
+import StoryCard from '../../components/StoryCard'
+import Newsletter from '../../components/Newsletter'
+import s from './Home.module.css'
 
 const tabs = ['All stories', 'World', 'Technology', 'Business', 'Culture', 'Lifestyle']
 
@@ -19,6 +19,11 @@ export default function Home({ saved, onSave }) {
   ]
   const latest = stories.slice(3).filter((story) => tab === 'All stories' || story.category === tab)
   const ranked = [stories[1], stories[6], stories[3], stories[9], stories[8]]
+  const readerVoices = [
+    { name: 'Maya R.', initials: 'MR', place: 'Nairobi', story: stories[0], quote: 'The local details are where these big ideas become real.' },
+    { name: 'Lina Chen', initials: 'LC', place: 'Singapore', story: stories[18], quote: 'This gave me a much clearer way to think about preparedness.' },
+    { name: 'David O.', initials: 'DO', place: 'London', story: stories[6], quote: 'Hopeful, but the implementation matters as much as the ambition.' },
+  ]
 
   return <>
     <div className={s.ticker}>
@@ -141,6 +146,32 @@ export default function Home({ saved, onSave }) {
         <Link to="/category/culture">Explore culture <Icon name="arrow" size={15} /></Link>
       </div>
       <div className={s.threeGrid}>{[stories[4], stories[9], stories[10]].map((story) => <StoryCard key={story.id} story={story} saved={saved} onSave={onSave} />)}</div>
+    </section>
+
+    <section className={s.readerPulse}>
+      <div className={s.bigSectionHeading}>
+        <div><span>READER PULSE</span><h2>What the community is saying</h2></div>
+        <Link to="/signup">Enter the Reader Room <Icon name="arrow" size={15} /></Link>
+      </div>
+      <div className={s.voiceGrid}>{readerVoices.map((reader, index) => <article className={s.voiceCard} key={reader.name}>
+        <Link className={s.voiceImage} to={`/article/${reader.story.id}`}><img src={reader.story.image} alt="" loading="lazy" /><span>{reader.story.category}</span></Link>
+        <div className={s.voicePerson}><i>{reader.initials}</i><div><strong>{reader.name}</strong><small>{reader.place} · Reader</small></div><span><b /> ONLINE</span></div>
+        <blockquote>“{reader.quote}”</blockquote>
+        <Link className={s.voiceThread} to={`/article/${reader.story.id}`}><Icon name="messages" size={14} /> Join {26 + index * 13} contributions <Icon name="right" size={13} /></Link>
+      </article>)}</div>
+    </section>
+
+    <section className={s.lensSection}>
+      <div className={s.lensIntro}><span>CHOOSE YOUR LENS</span><h2>One world.<br />Many ways in.</h2><p>Follow the subjects that move you, surprise you, or make you see the familiar differently.</p></div>
+      {[stories[12], stories[14], stories[17], stories[16]].map((story) => <Link to={`/category/${story.category.toLowerCase()}`} className={s.lensCard} key={story.id}>
+        <img src={story.image} alt="" loading="lazy" /><div><span>EXPLORE</span><h3>{story.category}</h3><p>{story.description}</p><Icon name="arrow" size={18} /></div>
+      </Link>)}
+    </section>
+
+    <section className={s.communityCta}>
+      <div className={s.communityFaces}><span>MR</span><span>LC</span><span>DO</span><span>TW</span><i>2,000+ readers</i></div>
+      <div><span>THE READER ROOM</span><h2>The story doesn’t end at the article.</h2><p>Ask better questions, exchange perspectives, and join thoughtful conversations with readers around the world.</p></div>
+      <Link to="/signup">Join the conversation <Icon name="arrow" size={16} /></Link>
     </section>
 
     <Newsletter wide />

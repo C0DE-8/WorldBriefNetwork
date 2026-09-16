@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { stories, articleBody } from '../data/stories'
-import Icon from '../components/Icon'
-import StoryCard from '../components/StoryCard'
-import Newsletter from '../components/Newsletter'
-import s from './Pages.module.css'
+import { stories, articleBody } from '../../data/stories'
+import Icon from '../../components/Icon'
+import StoryCard from '../../components/StoryCard'
+import Newsletter from '../../components/Newsletter'
+import Conversation from '../../components/Conversation'
+import s from './Article.module.css'
 
 export default function Article({ saved, onSave }) {
   const { id } = useParams()
@@ -62,6 +63,8 @@ export default function Article({ saved, onSave }) {
         <Link to={`/category/${story.category.toLowerCase()}`} className="darkButton">More in {story.category} <Icon name="arrow" size={15} /></Link>
       </div>
     </article>
+
+    <Conversation storyId={story.id} />
 
     <section className={s.relatedSection}>
       <div className={s.bigSectionHeading}>
