@@ -92,6 +92,11 @@ export default function Home({ saved, onSave }) {
       {limit < latest.length && <button className={s.loadMore} onClick={() => setLimit(limit + 6)}>Load more stories <Icon name="right" size={15} /></button>}
     </section>
 
+    <section className={s.longReadSection}>
+      <Link className={s.longReadImage} to={`/article/${stories[11].id}`}><img src={stories[11].image} alt={stories[11].title} loading="lazy" /><span>THE LONG READ · 8 MIN</span></Link>
+      <div className={s.longReadCopy}><span>EARTH / CONSERVATION</span><h2>{stories[11].title}</h2><p>{stories[11].description} Travel into the landscapes where protection is becoming a shared practice, not just a promise.</p><div><i>DB</i><small>Reported by<br /><b>{stories[11].author}</b></small></div><Link to={`/article/${stories[11].id}`}>Settle in and read <Icon name="arrow" size={15} /></Link></div>
+    </section>
+
     <section className={s.spotlight}>
       <div className={s.spotlightCopy}>
         <span>FIELD NOTES / 05</span>
@@ -105,12 +110,22 @@ export default function Home({ saved, onSave }) {
       </Link>
     </section>
 
+    <section className={s.quickReadsSection}>
+      <div className={s.quickIntro}><span>SHORT ON TIME?</span><h2>Four stories.<br />Twenty minutes.</h2><p>A quick route through culture, travel, sport, and public life.</p><Link to="/search">Find a quick read <Icon name="arrow" size={14} /></Link></div>
+      <div className={s.quickList}>{[stories[17], stories[13], stories[8], stories[7]].map((story, index) => <Link to={`/article/${story.id}`} key={story.id}><strong>0{index + 1}</strong><img src={story.image} alt="" loading="lazy" /><div><span>{story.category} · {story.time}</span><h3>{story.title}</h3></div><Icon name="arrow" size={16} /></Link>)}</div>
+    </section>
+
     <section className={s.deskSection}>
       <div className={s.bigSectionHeading}>
         <div><span>ACROSS THE NEWSROOM</span><h2>From every desk</h2></div>
         <Link to="/search">Browse all stories <Icon name="arrow" size={15} /></Link>
       </div>
       <div className={s.deskGrid}>{[stories[14], stories[15], stories[16], stories[18]].map((story) => <StoryCard key={story.id} story={story} saved={saved} onSave={onSave} />)}</div>
+    </section>
+
+    <section className={s.ideasSection}>
+      <div className={s.bigSectionHeading}><div><span>THE IDEAS LAB</span><h2>Thinking past tomorrow</h2></div><p>People, experiments, and possibilities<br />changing what comes next.</p></div>
+      <div className={s.ideasGrid}>{[stories[18], stories[14], stories[12]].map((story, index) => <article key={story.id} className={index === 0 ? s.ideaLead : ''}><Link to={`/article/${story.id}`}><img src={story.image} alt={story.title} loading="lazy" /></Link><div><span>IDEA 0{index + 1} / {story.category}</span><Link to={`/article/${story.id}`}><h3>{story.title}</h3></Link><p>{story.description}</p><small>{story.author} · {story.time}</small></div></article>)}</div>
     </section>
 
     <section className={s.briefingSection}>
@@ -140,12 +155,25 @@ export default function Home({ saved, onSave }) {
       </div>
     </section>
 
+    <section className={s.worldWindowSection}>
+      <div className={s.worldWindowHead}><span>WORLD WINDOW</span><h2>Four places to watch</h2><p>Local stories with consequences that travel far beyond the map.</p></div>
+      <div className={s.worldWindowGrid}>{[
+        ['EUROPE', stories[13]], ['PACIFIC', stories[6]], ['AMERICAS', stories[15]], ['GLOBAL CITIES', stories[19]],
+      ].map(([region, story], index) => <Link to={`/article/${story.id}`} key={region}><div className={s.regionTop}><span>{region}</span><em>0{index + 1}</em></div><img src={story.image} alt="" loading="lazy" /><h3>{story.title}</h3><small>{story.time} <Icon name="arrow" size={12} /></small></Link>)}</div>
+    </section>
+
     <section className={s.cultureSection}>
       <div className={s.bigSectionHeading}>
         <div><span>CULTURE & IDEAS</span><h2>A different perspective</h2></div>
         <Link to="/category/culture">Explore culture <Icon name="arrow" size={15} /></Link>
       </div>
       <div className={s.threeGrid}>{[stories[4], stories[9], stories[10]].map((story) => <StoryCard key={story.id} story={story} saved={saved} onSave={onSave} />)}</div>
+    </section>
+
+    <section className={s.weekendSection}>
+      <div className={s.weekendTitle}><span>THE WEEKEND EDIT</span><h2>Room to wander.</h2><p>Stories for when you have time to follow your curiosity wherever it leads.</p></div>
+      <Link className={s.weekendLead} to={`/article/${stories[2].id}`}><img src={stories[2].image} alt={stories[2].title} loading="lazy" /><div><span>TRAVEL</span><h3>{stories[2].title}</h3><p>{stories[2].description}</p></div></Link>
+      {[stories[9], stories[16]].map((story) => <Link className={s.weekendCard} to={`/article/${story.id}`} key={story.id}><img src={story.image} alt="" loading="lazy" /><div><span>{story.category}</span><h3>{story.title}</h3><small>{story.time}</small></div></Link>)}
     </section>
 
     <section className={s.readerPulse}>

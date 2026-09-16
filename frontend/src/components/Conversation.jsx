@@ -50,6 +50,7 @@ export default function Conversation({ storyId }) {
   const [sort, setSort] = useState('top')
   const [replying, setReplying] = useState('')
   const [liked, setLiked] = useState([])
+  const [open, setOpen] = useState(false)
   const readerCount = useMemo(() => 28 + storyId.length * 3, [storyId])
   const visibleComments = [...comments].sort((a, b) => sort === 'latest' ? new Date(b.createdAt) - new Date(a.createdAt) : b.likes - a.likes)
   const total = comments.reduce((count, comment) => count + 1 + (comment.replies?.length || 0), 0)
@@ -78,11 +79,12 @@ export default function Conversation({ storyId }) {
   }
 
   return <section className={s.conversation} aria-labelledby="conversation-heading">
-    <div className={s.conversationHeader}>
+    <button className={s.conversationHeader} onClick={() => setOpen(!open)} aria-expanded={open} aria-controls={`conversation-${storyId}`}>
       <div><span className={s.live}><i /> LIVE CONVERSATION</span><h2 id="conversation-heading">Talk about this story</h2><p>Bring a question. Add context. Keep it human.</p></div>
-      <div className={s.presence}><span>MR</span><span>LC</span><span>DO</span><b>{readerCount} reading now</b></div>
-    </div>
+      <div className={s.headerActions}><div className={s.presence}><span>MR</span><span>LC</span><span>DO</span><b>{readerCount} reading now · {total} contributions</b></div><span className={`${s.dropdown} ${open ? s.dropdownOpen : ''}`}><b>{open ? 'Close discussion' : 'Open discussion'}</b><Icon name="down" size={18} /></span></div>
+    </button>
 
+    {open && <div className={s.conversationBody} id={`conversation-${storyId}`}>
     {user ? <form className={s.composer} onSubmit={post}>
       <span className={s.userAvatar}>{initials(user.name)}</span>
       <div><textarea value={message} onChange={(event) => setMessage(event.target.value)} maxLength="1000" placeholder="What’s your perspective?" rows="3" /><div><small>{message.length}/1000 · Be curious, constructive, and kind.</small><button disabled={!message.trim()}>Join the conversation <Icon name="send" size={14} /></button></div></div>
@@ -94,5 +96,6 @@ export default function Conversation({ storyId }) {
     <div className={s.conversationBar}><strong>{total} contributions</strong><div><button className={sort === 'top' ? s.activeSort : ''} onClick={() => setSort('top')}>Top</button><button className={sort === 'latest' ? s.activeSort : ''} onClick={() => setSort('latest')}>Latest</button></div></div>
     <div className={s.comments}>{visibleComments.map((comment) => <Comment key={comment.id} comment={comment} user={user} onReply={reply} onLike={like} liked={liked.includes(comment.id)} replying={replying} setReplying={setReplying} />)}</div>
     <div className={s.guidelines}><Icon name="shield" size={15} /><span><b>A better conversation.</b> Challenge ideas, not people. Comments are stored locally in this preview.</span><Link to="/about">Community guide <Icon name="arrow" size={12} /></Link></div>
+    </div>}
   </section>
 }
