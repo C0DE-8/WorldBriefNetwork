@@ -122,7 +122,7 @@ export default function Seo() {
       '@id': `${origin}/#organization`,
       name: SITE_NAME,
       url: `${origin}/`,
-      logo: { '@type': 'ImageObject', url: new URL('/favicon.svg', origin).href },
+      logo: { '@type': 'ImageObject', url: new URL('/logo.png', origin).href },
       slogan: MOTTO,
     }
     const schema = details.story ? {

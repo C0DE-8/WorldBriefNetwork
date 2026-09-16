@@ -6,7 +6,7 @@ import Icon from './Icon'
 import s from './Layout.module.css'
 
 export function Brand() {
-  return <Link to="/" className={s.brand} aria-label="WorldBriefNetwork home"><span className={s.brandMark}><Icon name="globe" size={29} /></span><span>worldbrief<span className={s.network}>network<span className={s.dot}>.</span></span></span></Link>
+  return <Link to="/" className={s.brand} aria-label="WorldBriefNetwork home"><span className={s.brandMark}><img src="/logo.png" alt="" /></span><span>worldbrief<span className={s.network}>network<span className={s.dot}>.</span></span></span></Link>
 }
 
 export default function Layout({ saved }) {

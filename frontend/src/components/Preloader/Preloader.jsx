@@ -21,7 +21,7 @@ export default function Preloader() {
 
   if (!visible) return null
   return <div className={`${s.preloader} ${leaving ? s.leaving : ''}`} role="status" aria-label="Loading WorldBriefNetwork">
-    <div className={s.orbit}><img src="/favicon.svg" alt="" /></div>
+    <div className={s.orbit}><img src="/logo.png" alt="" /></div>
     <div className={s.wordmark}><strong>worldbrief</strong><span>network.</span></div>
     <p>KNOW YOUR WORLD. LEAD THE CONVERSATION.</p>
     <div className={s.track}><i /></div>
