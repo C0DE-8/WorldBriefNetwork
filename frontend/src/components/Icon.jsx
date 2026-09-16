@@ -1,0 +1,3 @@
+import { ArrowUpRight, ArrowRight, Search, Menu, X, Bookmark, Globe2, ChevronDown, ChevronLeft, ChevronRight, Mail, Sun, Clock, Headphones, Check, Share2, Play, SlidersHorizontal } from 'lucide-react'
+const icons = { arrow: ArrowUpRight, right: ArrowRight, search: Search, menu: Menu, close: X, bookmark: Bookmark, globe: Globe2, down: ChevronDown, left: ChevronLeft, next: ChevronRight, mail: Mail, sun: Sun, clock: Clock, headphones: Headphones, check: Check, share: Share2, play: Play, filters: SlidersHorizontal }
+export default function Icon({ name, size = 18, ...props }) { const Component = icons[name] || ArrowRight; return <Component size={size} strokeWidth={1.7} aria-hidden="true" {...props} /> }
