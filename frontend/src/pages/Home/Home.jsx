@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { stories } from '../../data/stories'
 import Icon from '../../components/Icon'
@@ -12,6 +12,8 @@ export default function Home({ saved, onSave }) {
   const [tab, setTab] = useState('All stories')
   const [limit, setLimit] = useState(6)
   const [brief, setBrief] = useState(0)
+  const [featureIndex, setFeatureIndex] = useState(0)
+  const [featurePaused, setFeaturePaused] = useState(false)
   const briefItems = [
     'The ideas, people, and places shaping a changing world',
     'A fresh perspective on the future of our cities',
@@ -19,11 +21,21 @@ export default function Home({ saved, onSave }) {
   ]
   const latest = stories.slice(3).filter((story) => tab === 'All stories' || story.category === tab)
   const ranked = [stories[1], stories[6], stories[3], stories[9], stories[8]]
+  const featureSlides = stories.slice(0, 5)
+  const featureStory = featureSlides[featureIndex]
   const readerVoices = [
     { name: 'Maya R.', initials: 'MR', place: 'Nairobi', story: stories[0], quote: 'The local details are where these big ideas become real.' },
     { name: 'Lina Chen', initials: 'LC', place: 'Singapore', story: stories[18], quote: 'This gave me a much clearer way to think about preparedness.' },
     { name: 'David O.', initials: 'DO', place: 'London', story: stories[6], quote: 'Hopeful, but the implementation matters as much as the ambition.' },
   ]
+
+  useEffect(() => {
+    if (featurePaused || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined
+    const timer = window.setInterval(() => setFeatureIndex((current) => (current + 1) % featureSlides.length), 6500)
+    return () => window.clearInterval(timer)
+  }, [featureIndex, featurePaused, featureSlides.length])
+
+  const changeFeature = (direction) => setFeatureIndex((current) => (current + direction + featureSlides.length) % featureSlides.length)
 
   return <>
     <div className={s.ticker}>
@@ -43,29 +55,37 @@ export default function Home({ saved, onSave }) {
         <p>Essential reporting, unexpected ideas, and a clearer view of the forces changing our world.</p>
       </div>
 
-      <Link to={`/article/${stories[0].id}`} className={s.leadStory}>
-        <img src={stories[0].image} alt="Sculptural contemporary architecture reaching toward the sky" />
-        <div className={s.leadShade} />
-        <div className={s.leadFlag}>THE BIG STORY</div>
-        <div className={s.leadContent}>
-          <span>{stories[0].category} / {stories[0].location}</span>
-          <h2>{stories[0].title}</h2>
-          <p>{stories[0].description}</p>
-          <small>BY {stories[0].author.toUpperCase()} <i /> {stories[0].time}</small>
+      <div className={s.leadStage} onMouseEnter={() => setFeaturePaused(true)} onMouseLeave={() => setFeaturePaused(false)} onFocusCapture={() => setFeaturePaused(true)} onBlurCapture={() => setFeaturePaused(false)}>
+        <Link to={`/article/${featureStory.id}`} className={s.leadStory} aria-live="polite">
+          <img key={featureStory.id} src={featureStory.image} alt={featureStory.title} />
+          <div className={s.leadShade} />
+          <div className={s.leadFlag}>{featureIndex === 0 ? 'THE BIG STORY' : 'FEATURED NOW'}</div>
+          <div className={s.leadContent} key={`${featureStory.id}-content`}>
+            <span>{featureStory.category} / {featureStory.location || 'WORLD BRIEFING'}</span>
+            <h2>{featureStory.title}</h2>
+            <p>{featureStory.description}</p>
+            <small>BY {featureStory.author.toUpperCase()} <i /> {featureStory.time}</small>
+          </div>
+        </Link>
+        <div className={s.slideControls}>
+          <span><b>0{featureIndex + 1}</b> / 0{featureSlides.length}</span>
+          <div><button aria-label="Previous featured story" onClick={() => changeFeature(-1)}><Icon name="left" size={15} /></button><button aria-label={featurePaused ? 'Play featured stories' : 'Pause featured stories'} onClick={() => setFeaturePaused(!featurePaused)}><Icon name={featurePaused ? 'play' : 'pause'} size={14} /></button><button aria-label="Next featured story" onClick={() => changeFeature(1)}><Icon name="next" size={15} /></button></div>
         </div>
-      </Link>
+        <div className={s.slideTimer}><i key={`${featureStory.id}-timer`} className={featurePaused ? s.timerPaused : ''} /></div>
+      </div>
 
       <aside className={s.headlineRail} aria-label="Top headlines">
         <div className={s.railHeading}><span>THE HEADLINES</span><Link to="/trending">VIEW ALL <Icon name="arrow" size={13} /></Link></div>
-        {stories.slice(1, 5).map((story, index) =>
-          <article className={s.railStory} key={story.id}>
+        {featureSlides.map((story, index) =>
+          <button className={`${s.railStory} ${featureIndex === index ? s.activeRailStory : ''} ${featurePaused ? s.railPaused : ''}`} key={story.id} onClick={() => setFeatureIndex(index)} aria-label={`Show featured story: ${story.title}`}>
             <span className={s.railNumber}>0{index + 1}</span>
             <div>
-              <Link to={`/category/${story.category.toLowerCase()}`} className={s.railCategory}>{story.category}</Link>
-              <Link to={`/article/${story.id}`}><h3>{story.title}</h3></Link>
+              <span className={s.railCategory}>{story.category}</span>
+              <h3>{story.title}</h3>
               <small>{story.time}</small>
             </div>
-          </article>
+            <i className={s.railProgress} />
+          </button>
         )}
       </aside>
     </section>
