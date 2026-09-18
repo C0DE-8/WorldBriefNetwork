@@ -3,6 +3,7 @@ import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useContent } from '../context/ContentContext'
 import { useAuth } from '../context/AuthContext'
 import Icon from './Icon'
+import CookieConsent from './CookieConsent'
 import s from './Layout.module.css'
 
 export function Brand() {
@@ -32,6 +33,7 @@ export default function Layout({ saved }) {
             {profile && <div className={s.profileMenu}>
               <span>READER ACCOUNT</span><strong>{user.name}</strong><small>{user.email}</small>
               <Link to="/saved" onClick={() => setProfile(false)}><Icon name="bookmark" size={14} /> Saved stories</Link>
+              <Link to="/following" onClick={() => setProfile(false)}><Icon name="user" size={14} /> Followed authors</Link>
               <button onClick={() => { signOut(); setProfile(false) }}><Icon name="logout" size={14} /> Sign out</button>
             </div>}
           </div> : <Link className={s.signIn} to="/login"><Icon name="user" size={16} /> Sign in</Link>}
@@ -47,5 +49,6 @@ export default function Layout({ saved }) {
       <div className={s.footerTop}><div><Brand /><p>Know your world.<br />Lead the conversation.</p></div><div><h4>Explore</h4><Link to="/category/world">World</Link><Link to="/category/technology">Technology</Link><Link to="/category/culture">Culture</Link></div><div><h4>WorldBriefNetwork</h4><Link to="/about">About us</Link><Link to="/contact">Contact</Link><Link to="/newsletter">The daily brief</Link></div><div><h4>Your reading room</h4><Link to="/saved">Saved stories</Link><Link to="/search">Discover stories</Link><Link to="/privacy">Privacy policy</Link></div></div>
       <div className={s.footerBottom}><span>© 2026 WorldBriefNetwork. All rights reserved.</span><span>Know your world. Lead the conversation.</span><span>Editorial demo · Sample stories</span></div>
     </footer>
+    <CookieConsent />
   </>
 }

@@ -58,7 +58,7 @@ export default function Auth({ mode }) {
         <button className={s.submitButton} disabled={busy}>{busy ? 'One moment…' : createAccount ? 'Create account' : 'Sign in'} <Icon name="right" size={16} /></button>
       </form>
       <small className={s.switch}>{createAccount ? 'Already have an account?' : 'New to WorldBriefNetwork?'} <Link to={createAccount ? '/login' : '/signup'} state={{ from: destination }}>{createAccount ? 'Sign in' : 'Join the conversation'}</Link></small>
-      <small className={s.demoNote}><Icon name="lock" size={12} /> Front-end preview: account data stays on this device.</small>
+      <small className={s.demoNote}><Icon name="lock" size={12} /> Your account is protected by a secure server session.</small>
     </div>
   </section>
 }

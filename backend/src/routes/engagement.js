@@ -13,6 +13,43 @@ router.get('/me/bookmarks', requireAuth, asyncRoute(async (req, res) => {
   ok(res, rows.map(mapStory))
 }))
 
+router.get('/me/following/stories', requireAuth, asyncRoute(async (req, res) => {
+  const [rows] = await pool.execute(`${storySelect} ${fromClause} JOIN author_followers af ON af.author_id=a.id WHERE af.user_id=? AND s.status='published' AND s.deleted_at IS NULL AND s.published_at<=UTC_TIMESTAMP() ORDER BY s.published_at DESC`, [req.user.id])
+  ok(res, rows.map(mapStory))
+}))
+
+router.put('/authors/:authorId/follow', requireAuth, asyncRoute(async (req, res) => {
+  const [authors] = await pool.execute('SELECT id FROM authors WHERE (id=? OR slug=?) AND is_active=TRUE', [req.params.authorId,req.params.authorId])
+  if (!authors[0]) throw new HttpError(404, 'AUTHOR_NOT_FOUND', 'Author not found.')
+  await pool.execute('INSERT IGNORE INTO author_followers (author_id,user_id) VALUES (?,?)', [authors[0].id,req.user.id])
+  const [[count]] = await pool.execute('SELECT COUNT(*)+(SELECT manual_follower_count FROM authors WHERE id=?) followerCount FROM author_followers WHERE author_id=?', [authors[0].id,authors[0].id])
+  ok(res, { followed:true, followerCount:Number(count.followerCount) })
+}))
+
+router.delete('/authors/:authorId/follow', requireAuth, asyncRoute(async (req, res) => {
+  const [authors] = await pool.execute('SELECT id FROM authors WHERE id=? OR slug=?', [req.params.authorId,req.params.authorId])
+  if (!authors[0]) throw new HttpError(404, 'AUTHOR_NOT_FOUND', 'Author not found.')
+  await pool.execute('DELETE FROM author_followers WHERE author_id=? AND user_id=?', [authors[0].id,req.user.id])
+  const [[count]] = await pool.execute('SELECT COUNT(*)+(SELECT manual_follower_count FROM authors WHERE id=?) followerCount FROM author_followers WHERE author_id=?', [authors[0].id,authors[0].id])
+  ok(res, { followed:false, followerCount:Number(count.followerCount) })
+}))
+
+router.put('/authors/:authorId/like', requireAuth, asyncRoute(async (req, res) => {
+  const [authors] = await pool.execute('SELECT id FROM authors WHERE (id=? OR slug=?) AND is_active=TRUE', [req.params.authorId,req.params.authorId])
+  if (!authors[0]) throw new HttpError(404, 'AUTHOR_NOT_FOUND', 'Author not found.')
+  await pool.execute('INSERT IGNORE INTO author_likes (author_id,user_id) VALUES (?,?)', [authors[0].id,req.user.id])
+  const [[count]] = await pool.execute('SELECT COUNT(*)+(SELECT manual_like_count FROM authors WHERE id=?) likeCount FROM author_likes WHERE author_id=?', [authors[0].id,authors[0].id])
+  ok(res, { liked:true, likeCount:Number(count.likeCount) })
+}))
+
+router.delete('/authors/:authorId/like', requireAuth, asyncRoute(async (req, res) => {
+  const [authors] = await pool.execute('SELECT id FROM authors WHERE id=? OR slug=?', [req.params.authorId,req.params.authorId])
+  if (!authors[0]) throw new HttpError(404, 'AUTHOR_NOT_FOUND', 'Author not found.')
+  await pool.execute('DELETE FROM author_likes WHERE author_id=? AND user_id=?', [authors[0].id,req.user.id])
+  const [[count]] = await pool.execute('SELECT COUNT(*)+(SELECT manual_like_count FROM authors WHERE id=?) likeCount FROM author_likes WHERE author_id=?', [authors[0].id,authors[0].id])
+  ok(res, { liked:false, likeCount:Number(count.likeCount) })
+}))
+
 router.put('/me/bookmarks/:storyId', requireAuth, asyncRoute(async (req, res) => {
   const [stories] = await pool.execute('SELECT id FROM stories WHERE id=? OR slug=?', [req.params.storyId,req.params.storyId])
   if (!stories[0]) throw new HttpError(404, 'STORY_NOT_FOUND', 'Story not found.')

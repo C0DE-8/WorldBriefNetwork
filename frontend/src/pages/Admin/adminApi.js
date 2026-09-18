@@ -2,6 +2,16 @@ import { api } from '../../api/api.js'
 
 export const getDashboard = () => api('/admin/dashboard')
 export const getAdminStories = () => api('/admin/stories')
+export const getAdminStory = (id) => api(`/admin/stories/${id}`)
+export const getStoryOptions = () => api('/admin/story-options')
+export const createStory = (values) => api('/admin/stories', { method: 'POST', body: JSON.stringify(values) })
+export const saveStory = (id, values) => api(`/admin/stories/${id}`, { method: 'PUT', body: JSON.stringify(values) })
+export const deleteStory = (id) => api(`/admin/stories/${id}`, { method: 'DELETE' })
+export const uploadStoryImage = (file) => { const body = new FormData(); body.append('image', file); return api('/admin/uploads', { method: 'POST', body, headers: { 'Content-Type': 'multipart/form-data' } }) }
+export const getAuthors = () => api('/admin/authors')
+export const createAuthor = (values) => api('/admin/authors', { method:'POST', body:JSON.stringify(values) })
+export const saveAuthor = (id, values) => api(`/admin/authors/${id}`, { method:'PUT', body:JSON.stringify(values) })
+export const deleteAuthor = (id) => api(`/admin/authors/${id}`, { method:'DELETE' })
 export const updateStoryStatus = (id, status) => api(`/admin/stories/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) })
 export const getContacts = () => api('/admin/contacts')
 export const updateContactStatus = (id, status) => api(`/admin/contacts/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) })

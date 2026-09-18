@@ -11,6 +11,18 @@ router.get('/categories', asyncRoute(async (_req, res) => {
   ok(res, rows)
 }))
 
+router.get('/authors/:slug', asyncRoute(async (req, res) => {
+  const [rows] = await pool.execute(`SELECT a.id,a.name,a.slug,a.bio,
+    (SELECT COUNT(*) FROM author_followers af WHERE af.author_id=a.id)+a.manual_follower_count followerCount,
+    (SELECT COUNT(*) FROM author_likes al WHERE al.author_id=a.id)+a.manual_like_count likeCount,
+    ${req.user ? 'EXISTS(SELECT 1 FROM author_followers mine WHERE mine.author_id=a.id AND mine.user_id=?)' : 'FALSE'} followed,
+    ${req.user ? 'EXISTS(SELECT 1 FROM author_likes mine_like WHERE mine_like.author_id=a.id AND mine_like.user_id=?)' : 'FALSE'} liked
+    FROM authors a WHERE a.slug=? AND a.is_active=TRUE`, req.user ? [req.user.id,req.user.id,req.params.slug] : [req.params.slug])
+  if (!rows[0]) throw new HttpError(404, 'AUTHOR_NOT_FOUND', 'Author not found.')
+  const [stories] = await pool.execute(`${storySelect} ${fromClause} WHERE a.id=? AND s.status='published' AND s.deleted_at IS NULL AND s.published_at<=UTC_TIMESTAMP() ORDER BY s.published_at DESC`, [rows[0].id])
+  ok(res, { ...rows[0], followerCount:Number(rows[0].followerCount), likeCount:Number(rows[0].likeCount), followed:Boolean(rows[0].followed), liked:Boolean(rows[0].liked), stories:stories.map(mapStory) })
+}))
+
 router.get('/stories', asyncRoute(async (req, res) => {
   const limit = Math.min(Math.max(Number(req.query.limit) || 24, 1), 100)
   const page = Math.max(Number(req.query.page) || 1, 1)

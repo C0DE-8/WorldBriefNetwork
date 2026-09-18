@@ -22,6 +22,7 @@ export default function AdminLayout() {
       <nav>
         <NavLink end to="/admin">Dashboard</NavLink>
         <NavLink to="/admin/stories">Stories</NavLink>
+        <NavLink to="/admin/authors">Authors</NavLink>
         <NavLink to="/admin/moderation">Moderation</NavLink>
         <NavLink to="/admin/contacts">Contacts</NavLink>
         {user.roles?.some((role) => ['admin','super_admin'].includes(role)) && <NavLink to="/admin/users">Users</NavLink>}

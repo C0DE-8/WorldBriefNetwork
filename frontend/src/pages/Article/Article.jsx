@@ -21,6 +21,7 @@ export default function Article({ saved, onSave }) {
     ...stories.filter((item) => item.id !== id && item.category !== story.category),
   ].slice(0, 5)
   const paragraphs = articleBody(story)
+  const published = story.publishedAt ? new Date(story.publishedAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) : ''
 
   async function share() {
     try {
@@ -41,7 +42,7 @@ export default function Article({ saved, onSave }) {
         <p>{story.description}</p>
         <div className={s.articleMeta}>
           <span className={s.avatar}>{story.author.split(' ').map((name) => name[0]).join('')}</span>
-          <div><strong>{story.author}</strong><small>September 15, 2026 · {story.time}</small></div>
+          <div><Link to={`/author/${story.authorSlug}`}><strong>{story.author}</strong></Link><small>{published} · {story.time}</small></div>
           <button onClick={() => onSave(id)} aria-pressed={saved.includes(id)}><Icon name="bookmark" fill={saved.includes(id) ? 'currentColor' : 'none'} />{saved.includes(id) ? 'Saved' : 'Save story'}</button>
           <button onClick={share}><Icon name="share" /> Share</button>
         </div>
@@ -49,10 +50,10 @@ export default function Article({ saved, onSave }) {
       </div>
       <figure className={s.articleImage}>
         <img src={story.image} alt={story.title} />
-        <figcaption>Photo: Unsplash · Editorial illustration</figcaption>
+        <figcaption>{story.imageCaption || `Photo: ${story.imageCredit || 'Editorial illustration'}`}</figcaption>
       </figure>
       <div className={s.articleBody}>
-        <span className={s.demoNote}>EDITORIAL PREVIEW · SAMPLE ARTICLE</span>
+        {!story.publishedAt && <span className={s.demoNote}>EDITORIAL PREVIEW · SAMPLE ARTICLE</span>}
         {paragraphs.map((paragraph, index) => <div key={paragraph}>
           <p className={index === 0 ? s.firstParagraph : ''}>{paragraph}</p>
           {index === 1 && related[0] && <aside className={s.inlineRelated} aria-label="Related story">

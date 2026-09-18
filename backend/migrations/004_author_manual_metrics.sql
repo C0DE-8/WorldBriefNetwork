@@ -1,0 +1,3 @@
+ALTER TABLE authors
+  ADD COLUMN manual_like_count INT UNSIGNED NOT NULL DEFAULT 0,
+  ADD COLUMN manual_follower_count INT UNSIGNED NOT NULL DEFAULT 0;
