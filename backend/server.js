@@ -1,0 +1,43 @@
+const express = require('express')
+const cors = require('cors')
+const helmet = require('helmet')
+const cookieParser = require('cookie-parser')
+const { rateLimit } = require('express-rate-limit')
+const config = require('./src/config')
+const { pool } = require('./src/db')
+const { optionalAuth } = require('./src/lib/auth')
+const contentRoutes = require('./src/routes/content')
+const authRoutes = require('./src/routes/auth')
+const engagementRoutes = require('./src/routes/engagement')
+const formRoutes = require('./src/routes/forms')
+const adminRoutes = require('./src/routes/admin')
+
+if (!config.jwtSecret) throw new Error('JWT_SECRET is required in production')
+
+const app = express()
+app.disable('x-powered-by')
+app.set('trust proxy', 1)
+app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }))
+app.use(cors({ origin: config.frontendUrl, credentials: true }))
+app.use(express.json({ limit: '1mb' }))
+app.use(cookieParser())
+app.use(rateLimit({ windowMs: 60_000, limit: 180, standardHeaders: 'draft-8', legacyHeaders: false }))
+app.use(optionalAuth)
+
+app.get('/api/v1/health', async (_req, res) => {
+  try { await pool.query('SELECT 1'); res.json({ data: { status: 'ok', database: 'connected' } }) }
+  catch { res.status(503).json({ error: { code: 'DATABASE_UNAVAILABLE', message: 'Database connection is unavailable.' } }) }
+})
+app.use('/api/v1/auth', rateLimit({ windowMs: 15 * 60_000, limit: 50 }), authRoutes)
+app.use('/api/v1/admin', adminRoutes)
+app.use('/api/v1', engagementRoutes, formRoutes, contentRoutes)
+app.use((_req, res) => res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Route not found.' } }))
+app.use((error, _req, res, _next) => {
+  if (error.code === 'ER_DUP_ENTRY') return res.status(409).json({ error: { code: 'CONFLICT', message: 'That record already exists.' } })
+  const status = error.status || 500
+  if (status === 500) console.error(error)
+  res.status(status).json({ error: { code: error.code || 'INTERNAL_ERROR', message: status === 500 ? 'An unexpected error occurred.' : error.message, fields: error.fields } })
+})
+
+if (require.main === module) app.listen(config.port, () => console.log(`WorldBriefNetwork API listening on http://localhost:${config.port}`))
+module.exports = app

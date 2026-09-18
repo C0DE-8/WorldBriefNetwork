@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { stories } from '../../data/stories'
+import { useContent } from '../../context/ContentContext'
 import Icon from '../../components/Icon'
 import StoryCard from '../../components/StoryCard'
 import Newsletter from '../../components/Newsletter'
@@ -9,6 +9,7 @@ import s from './Home.module.css'
 const tabs = ['All stories', 'World', 'Technology', 'Business', 'Culture', 'Lifestyle']
 
 export default function Home({ saved, onSave }) {
+  const { stories } = useContent()
   const [tab, setTab] = useState('All stories')
   const [limit, setLimit] = useState(6)
   const [brief, setBrief] = useState(0)

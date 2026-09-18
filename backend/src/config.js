@@ -1,0 +1,19 @@
+const path = require('node:path')
+require('dotenv').config({ path: path.join(__dirname, '..', '.env') })
+
+const production = process.env.NODE_ENV === 'production'
+
+module.exports = {
+  production,
+  port: Number(process.env.PORT || 4000),
+  frontendUrl: process.env.FRONTEND_URL || 'http://localhost:5173',
+  jwtSecret: process.env.JWT_SECRET || (production ? '' : 'development-only-secret-change-before-production'),
+  sessionDays: Number(process.env.SESSION_DAYS || 30),
+  db: {
+    host: process.env.DB_HOST || '127.0.0.1',
+    port: Number(process.env.DB_PORT || 3306),
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASSWORD || '',
+    database: process.env.DB_NAME || 'worldbriefnet',
+  },
+}

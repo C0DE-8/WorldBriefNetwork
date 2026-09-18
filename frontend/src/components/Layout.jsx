@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { categories } from '../data/stories'
+import { useContent } from '../context/ContentContext'
 import { useAuth } from '../context/AuthContext'
 import Icon from './Icon'
 import s from './Layout.module.css'
@@ -10,6 +10,7 @@ export function Brand() {
 }
 
 export default function Layout({ saved }) {
+  const { categories } = useContent()
   const [menu, setMenu] = useState(false)
   const [search, setSearch] = useState(false)
   const [profile, setProfile] = useState(false)

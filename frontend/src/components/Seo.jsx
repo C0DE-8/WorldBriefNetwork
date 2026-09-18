@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
-import { categories, stories } from '../data/stories'
+import { useContent } from '../context/ContentContext'
 
 const SITE_NAME = 'WorldBriefNetwork'
 const MOTTO = 'Know your world. Lead the conversation.'
@@ -20,7 +20,7 @@ function removeMeta(attribute, key) {
   document.head.querySelector(`meta[${attribute}="${key}"]`)?.remove()
 }
 
-function pageDetails(pathname, search) {
+function pageDetails(pathname, search, stories, categories) {
   const articleId = pathname.match(/^\/article\/([^/]+)$/)?.[1]
   const story = stories.find((item) => item.id === articleId)
   if (story) return {
@@ -65,9 +65,10 @@ function pageDetails(pathname, search) {
 
 export default function Seo() {
   const { pathname, search } = useLocation()
+  const { stories, categories } = useContent()
 
   useEffect(() => {
-    const details = pageDetails(pathname, search)
+    const details = pageDetails(pathname, search, stories, categories)
     const origin = window.location.origin
     const canonicalPath = pathname === '/search' ? '/search' : pathname
     const canonical = new URL(canonicalPath, origin).href
@@ -161,7 +162,7 @@ export default function Seo() {
     }
     script.textContent = JSON.stringify(schema)
     window.scrollTo(0, 0)
-  }, [pathname, search])
+  }, [pathname, search, stories, categories])
 
   return null
 }

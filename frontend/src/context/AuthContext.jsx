@@ -1,72 +1,35 @@
-import { createContext, useContext, useMemo, useState } from 'react'
+import { createContext, useContext, useEffect, useMemo, useState } from 'react'
+import { api } from '../api/api.js'
 
 const AuthContext = createContext(null)
-const USERS_KEY = 'wbn-demo-users'
-const SESSION_KEY = 'wbn-demo-session'
-
-function readStorage(key, fallback) {
-  try {
-    const value = JSON.parse(localStorage.getItem(key) || 'null')
-    return value ?? fallback
-  } catch {
-    return fallback
-  }
-}
-
-async function hashPassword(email, password) {
-  const bytes = new TextEncoder().encode(`${email.toLowerCase().trim()}:${password}`)
-  const digest = await crypto.subtle.digest('SHA-256', bytes)
-  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('')
-}
-
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(() => readStorage(SESSION_KEY, null))
+  const [user, setUser] = useState(null)
+  const [ready, setReady] = useState(false)
+
+  useEffect(() => { api('/auth/me').then(({ data }) => setUser(data)).catch(() => setUser(null)).finally(() => setReady(true)) }, [])
 
   async function signUp({ name, email, password }) {
-    const normalizedEmail = email.toLowerCase().trim()
-    const users = readStorage(USERS_KEY, [])
-    if (users.some((account) => account.email === normalizedEmail)) throw new Error('An account with this email already exists.')
-    const account = {
-      id: crypto.randomUUID(),
-      name: name.trim(),
-      email: normalizedEmail,
-      passwordHash: await hashPassword(normalizedEmail, password),
-      joinedAt: new Date().toISOString(),
-    }
-    localStorage.setItem(USERS_KEY, JSON.stringify([...users, account]))
-    const session = { id: account.id, name: account.name, email: account.email }
-    localStorage.setItem(SESSION_KEY, JSON.stringify(session))
-    setUser(session)
-    return session
+    const { data } = await api('/auth/register', { method: 'POST', body: JSON.stringify({ name, email, password }) })
+    setUser(data)
+    return data
   }
 
   async function signIn({ email, password }) {
-    const normalizedEmail = email.toLowerCase().trim()
-    const passwordHash = await hashPassword(normalizedEmail, password)
-    const account = readStorage(USERS_KEY, []).find((item) => item.email === normalizedEmail && item.passwordHash === passwordHash)
-    if (!account) throw new Error('The email or password is incorrect.')
-    const session = { id: account.id, name: account.name, email: account.email }
-    localStorage.setItem(SESSION_KEY, JSON.stringify(session))
-    setUser(session)
-    return session
+    const { data } = await api('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) })
+    setUser(data)
+    return data
   }
 
-  async function resetPassword({ email, password }) {
-    const normalizedEmail = email.toLowerCase().trim()
-    const users = readStorage(USERS_KEY, [])
-    const accountIndex = users.findIndex((item) => item.email === normalizedEmail)
-    if (accountIndex < 0) throw new Error('No account stored on this device uses that email.')
-    const nextUsers = [...users]
-    nextUsers[accountIndex] = { ...nextUsers[accountIndex], passwordHash: await hashPassword(normalizedEmail, password) }
-    localStorage.setItem(USERS_KEY, JSON.stringify(nextUsers))
+  async function resetPassword({ email }) {
+    await api('/auth/forgot-password', { method: 'POST', body: JSON.stringify({ email }) })
   }
 
-  function signOut() {
-    localStorage.removeItem(SESSION_KEY)
+  async function signOut() {
+    await api('/auth/logout', { method: 'POST' }).catch(() => {})
     setUser(null)
   }
 
-  const value = useMemo(() => ({ user, signUp, signIn, signOut, resetPassword }), [user])
+  const value = useMemo(() => ({ user, ready, signUp, signIn, signOut, resetPassword }), [user, ready])
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
 

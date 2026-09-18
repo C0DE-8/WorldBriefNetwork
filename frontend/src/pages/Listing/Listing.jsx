@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
-import { categories, stories } from '../../data/stories'
+import { useContent } from '../../context/ContentContext'
 import StoryCard from '../../components/StoryCard'
 import Icon from '../../components/Icon'
 import s from './Listing.module.css'
 export default function Listing({ type, saved, onSave }) {
+ const {categories,stories}=useContent()
  const {category}=useParams();const [params,setParams]=useSearchParams();const [sort,setSort]=useState('latest');const query=params.get('q')||''
  const categoryName=categories.find(c=>c.toLowerCase()===category)
  const title=type==='saved'?'Your reading room':type==='search'?'Follow your curiosity':type==='trending'?'The conversation starts here':categoryName||'Category not found'

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { stories, articleBody } from '../../data/stories'
+import { articleBody } from '../../data/stories'
+import { useContent } from '../../context/ContentContext'
 import Icon from '../../components/Icon'
 import StoryCard from '../../components/StoryCard'
 import Newsletter from '../../components/Newsletter'
@@ -8,6 +9,7 @@ import Conversation from '../../components/Conversation'
 import s from './Article.module.css'
 
 export default function Article({ saved, onSave }) {
+  const { stories } = useContent()
   const { id } = useParams()
   const story = stories.find((item) => item.id === id)
   const [shared, setShared] = useState('')
