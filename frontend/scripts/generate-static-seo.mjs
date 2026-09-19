@@ -1,9 +1,11 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
+import { loadEnv } from 'vite'
 
 const outputDirectory = resolve('dist')
 const shell = await readFile(resolve(outputDirectory, 'index.html'), 'utf8')
-const apiUrl = (process.env.VITE_API_URL || 'http://localhost:4000/api/v1').replace(/\/$/, '')
+const productionEnv = loadEnv('production', process.cwd(), '')
+const apiUrl = (process.env.VITE_API_URL || productionEnv.VITE_API_URL || 'http://localhost:4000/api/v1').replace(/\/$/, '')
 let stories = []
 try {
   const response = await fetch(`${apiUrl}/stories?limit=100`)
