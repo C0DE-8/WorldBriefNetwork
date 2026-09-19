@@ -48,7 +48,7 @@ export default function Article({ saved, onSave }) {
         {shared && <div role="status" className={s.shareNotice}>{shared}</div>}
       </div>
       <figure className={s.articleImage}>
-        <img src={story.image} alt={story.title} />
+        <div className={s.imageFrame}><img src={story.image} alt={story.title} /></div>
         <figcaption>{story.imageCaption || `Photo: ${story.imageCredit || 'Editorial illustration'}`}</figcaption>
       </figure>
       <div className={s.articleBody}>
