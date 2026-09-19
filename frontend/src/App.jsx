@@ -23,6 +23,8 @@ import Contacts from './pages/Admin/Contacts'
 import Users from './pages/Admin/Users'
 import NotFound from './pages/NotFound/NotFound'
 import Author from './pages/Author/Author'
+import Profile from './pages/Profile/Profile'
+import AccountRequests from './pages/Admin/AccountRequests'
 
 function AppRoutes() {
   const { user } = useAuth()
@@ -33,10 +35,10 @@ function AppRoutes() {
   return <><Seo/><Routes>
     <Route path="admin/login" element={<AdminLogin/>}/>
     <Route path="admin" element={<AdminLayout/>}>
-      <Route index element={<Dashboard/>}/><Route path="stories" element={<Stories/>}/><Route path="stories/new" element={<StoryEditor/>}/><Route path="stories/:id" element={<StoryEditor/>}/><Route path="authors" element={<Authors/>}/><Route path="moderation" element={<Moderation/>}/><Route path="contacts" element={<Contacts/>}/><Route path="users" element={<Users/>}/>
+      <Route index element={<Dashboard/>}/><Route path="profile" element={<Profile admin/>}/><Route path="stories" element={<Stories/>}/><Route path="stories/new" element={<StoryEditor/>}/><Route path="stories/:id" element={<StoryEditor/>}/><Route path="authors" element={<Authors/>}/><Route path="moderation" element={<Moderation/>}/><Route path="contacts" element={<Contacts/>}/><Route path="users" element={<Users/>}/><Route path="account-requests" element={<AccountRequests/>}/>
     </Route>
     <Route element={<Layout saved={saved}/>}>
-      <Route index element={<Home {...props}/>}/><Route path="category/:category" element={<Listing {...props}/>}/><Route path="article/:id" element={<Article {...props} key={window.location.pathname}/>}/><Route path="author/:slug" element={<Author {...props}/>}/><Route path="login" element={<Auth mode="login"/>}/><Route path="signup" element={<Auth mode="signup"/>}/><Route path="forgot-password" element={<ForgotPassword/>}/>
+      <Route index element={<Home {...props}/>}/><Route path="category/:category" element={<Listing {...props}/>}/><Route path="article/:id" element={<Article {...props} key={window.location.pathname}/>}/><Route path="author/:slug" element={<Author {...props}/>}/><Route path="profile" element={<Profile/>}/><Route path="login" element={<Auth mode="login"/>}/><Route path="signup" element={<Auth mode="signup"/>}/><Route path="forgot-password" element={<ForgotPassword/>}/>
       {['search','saved','trending','following'].map(type=><Route key={type} path={type} element={<Listing type={type} {...props}/>}/>)}
       {['about','contact','privacy','newsletter'].map(type=><Route key={type} path={type} element={<Info key={type} type={type}/>}/>)}
       <Route path="*" element={<NotFound/>}/>

@@ -53,6 +53,37 @@ router.post('/logout', requireAuth, asyncRoute(async (req, res) => {
 
 router.get('/me', asyncRoute(async (req, res) => ok(res, req.user ? publicUser(req.user) : null)))
 
+router.patch('/profile', requireAuth, asyncRoute(async (req,res)=>{
+  const name=String(req.body.name||'').trim();const email=cleanEmail(req.body.email)
+  if(name.length<2||name.length>100)throw new HttpError(422,'VALIDATION_ERROR','Display name must be between 2 and 100 characters.')
+  if(!/^\S+@\S+\.\S+$/.test(email))throw new HttpError(422,'VALIDATION_ERROR','Enter a valid email address.')
+  const [existing]=await pool.execute('SELECT id FROM users WHERE email=? AND id<>? AND deleted_at IS NULL',[email,req.user.id])
+  if(existing.length)throw new HttpError(409,'EMAIL_EXISTS','An account with this email already exists.')
+  const staff=req.user.roles.some(role=>['editor','moderator','admin','super_admin'].includes(role))
+  if(staff){await pool.execute('UPDATE users SET display_name=?,email=? WHERE id=?',[name,email,req.user.id]);return ok(res,{id:req.user.id,name,email,roles:req.user.roles,approved:true})}
+  await pool.execute("UPDATE account_requests SET status='rejected',reviewed_at=UTC_TIMESTAMP() WHERE user_id=? AND request_type='profile_change' AND status='pending'",[req.user.id])
+  const id=crypto.randomUUID();await pool.execute("INSERT INTO account_requests (id,user_id,request_type,proposed_data) VALUES (?,?,'profile_change',?)",[id,req.user.id,JSON.stringify({name,email})])
+  ok(res,{id,pending:true,message:'Your profile change was sent to an administrator for approval.'})
+}))
+
+router.post('/delete-account-request',requireAuth,asyncRoute(async(req,res)=>{
+  if(req.user.roles.some(role=>['admin','super_admin'].includes(role)))throw new HttpError(422,'INVALID_ACTION','Administrator accounts cannot request deletion here.')
+  const [found]=await pool.execute("SELECT id FROM account_requests WHERE user_id=? AND request_type='account_deletion' AND status='pending'",[req.user.id])
+  if(found[0])return ok(res,{id:found[0].id,pending:true,message:'Your account deletion request is already awaiting approval.'})
+  const id=crypto.randomUUID();await pool.execute("INSERT INTO account_requests (id,user_id,request_type) VALUES (?,?,'account_deletion')",[id,req.user.id])
+  ok(res,{id,pending:true,message:'Your permanent account deletion request was sent to an administrator.'})
+}))
+
+router.patch('/password', requireAuth, asyncRoute(async (req,res)=>{
+  const currentPassword=String(req.body.currentPassword||'');const newPassword=String(req.body.newPassword||'')
+  if(newPassword.length<8||newPassword.length>200)throw new HttpError(422,'VALIDATION_ERROR','New password must be between 8 and 200 characters.')
+  const [rows]=await pool.execute('SELECT password_hash FROM users WHERE id=?',[req.user.id])
+  if(!rows[0]||!(await bcrypt.compare(currentPassword,rows[0].password_hash)))throw new HttpError(401,'INVALID_CURRENT_PASSWORD','The current password is incorrect.')
+  const passwordHash=await bcrypt.hash(newPassword,12);await pool.execute('UPDATE users SET password_hash=? WHERE id=?',[passwordHash,req.user.id])
+  await pool.execute('UPDATE auth_sessions SET revoked_at=UTC_TIMESTAMP() WHERE user_id=? AND id<>? AND revoked_at IS NULL',[req.user.id,req.user.sessionId])
+  ok(res,{success:true,message:'Password updated successfully.'})
+}))
+
 router.post('/forgot-password', asyncRoute(async (req, res) => {
   const [rows] = await pool.execute('SELECT id FROM users WHERE email=? AND status=\'active\'', [cleanEmail(req.body.email)])
   if (rows[0]) {

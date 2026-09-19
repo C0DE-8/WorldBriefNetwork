@@ -33,8 +33,9 @@ export default function AdminLayout() {
         <NavLink to="/admin/moderation"><i>CM</i><b>Moderation</b></NavLink>
         <NavLink to="/admin/contacts"><i>IN</i><b>Contacts</b></NavLink>
         {user.roles?.some((role) => ['admin','super_admin'].includes(role)) && <NavLink to="/admin/users"><i>US</i><b>Users</b></NavLink>}
+        {user.roles?.some((role) => ['admin','super_admin'].includes(role)) && <NavLink to="/admin/account-requests"><i>RQ</i><b>Requests</b></NavLink>}
       </nav>
-      <div className={shell.account}><small>SIGNED IN AS</small><strong>{user.name}</strong><span>{user.email}</span><button onClick={logout}>Sign out</button></div>
+      <div className={shell.account}><small>SIGNED IN AS</small><strong>{user.name}</strong><span>{user.email}</span><NavLink to="/admin/profile">Manage profile</NavLink><button onClick={logout}>Sign out</button></div>
     </aside>
     <div className={shell.content}><header className={shell.toolbar}><button className={shell.collapse} onClick={toggle} aria-label={collapsed?'Expand sidebar':'Collapse sidebar'}>{collapsed?'→':'←'}</button><form className={shell.search} onSubmit={search}><span>⌕</span><input name="q" defaultValue={params.get('q')||''} key={`${location.pathname}-${params.get('q')}`} aria-label="Search admin" placeholder="Search this section…"/><button>Search</button></form><div className={shell.toolbarMeta}><strong>WorldBriefNetwork</strong><small>Newsroom administration</small></div></header><main className={shell.workspace}><Outlet /></main></div>
   </div>

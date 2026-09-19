@@ -24,12 +24,16 @@ export function AuthProvider({ children }) {
     await api('/auth/forgot-password', { method: 'POST', body: JSON.stringify({ email }) })
   }
 
+  async function updateProfile(values) { const {data}=await api('/auth/profile',{method:'PATCH',body:JSON.stringify(values)});if(!data.pending)setUser(data);return data }
+  async function changePassword(values) { return api('/auth/password',{method:'PATCH',body:JSON.stringify(values)}) }
+  async function requestAccountDeletion() { return api('/auth/delete-account-request',{method:'POST'}) }
+
   async function signOut() {
     await api('/auth/logout', { method: 'POST' }).catch(() => {})
     setUser(null)
   }
 
-  const value = useMemo(() => ({ user, ready, signUp, signIn, signOut, resetPassword }), [user, ready])
+  const value = useMemo(() => ({ user, ready, signUp, signIn, signOut, resetPassword, updateProfile, changePassword, requestAccountDeletion }), [user, ready])
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
 

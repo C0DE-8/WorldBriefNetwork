@@ -34,6 +34,7 @@ export default function Layout({ saved }) {
               <span>READER ACCOUNT</span><strong>{user.name}</strong><small>{user.email}</small>
               <Link to="/saved" onClick={() => setProfile(false)}><Icon name="bookmark" size={14} /> Saved stories</Link>
               <Link to="/following" onClick={() => setProfile(false)}><Icon name="user" size={14} /> Followed authors</Link>
+              <Link to="/profile" onClick={() => setProfile(false)}><Icon name="user" size={14} /> Manage profile</Link>
               <button onClick={() => { signOut(); setProfile(false) }}><Icon name="logout" size={14} /> Sign out</button>
             </div>}
           </div> : <Link className={s.signIn} to="/login"><Icon name="user" size={16} /> Sign in</Link>}

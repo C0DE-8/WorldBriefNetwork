@@ -45,6 +45,10 @@ test('reader and administrator critical journeys', async ({ page }) => {
   await page.goto('/following')
   await expect(page.getByText('Dangote opens Africa’s biggest IPO')).toBeVisible()
 
+  await page.goto('/profile')
+  await page.getByRole('button', { name: 'Request profile change' }).click()
+  await expect(page.getByText(/sent to an administrator for approval/i)).toBeVisible()
+
   await page.goto('/contact')
   await page.getByLabel('Your name').fill('habibi')
   await page.getByLabel('Email address').fill('8amhabibi@gmail.com')
@@ -60,7 +64,14 @@ test('reader and administrator critical journeys', async ({ page }) => {
   await page.getByLabel('Password').fill(password)
   await page.getByRole('button', { name: /sign in to admin/i }).click()
   await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible()
-  await page.getByRole('link', { name: 'Stories' }).click()
+  await page.getByRole('link', { name: 'Manage profile' }).click()
+  await expect(page.getByRole('heading', { name: 'Manage your profile' })).toBeVisible()
+  await page.getByRole('link', { name: /Requests/ }).click()
+  const profileRequest = page.locator('article').filter({ hasText: '8amhabibi@gmail.com' }).filter({ hasText: 'Profile change' }).first()
+  await expect(profileRequest).toBeVisible()
+  await profileRequest.getByRole('button', { name: 'Approve' }).click()
+  await expect(profileRequest).toHaveCount(0)
+  await page.getByRole('link', { name: /Stories/ }).click()
   await expect(page.getByText('Dangote opens Africa’s biggest IPO')).toBeVisible()
 
   await page.getByRole('link', { name: 'New story' }).click()
