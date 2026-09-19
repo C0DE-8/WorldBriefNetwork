@@ -53,7 +53,14 @@ function storyInput(body, partial = false) {
   } else if (!partial) fields.status = 'draft'
   if (body.featured !== undefined) fields.featured = Boolean(body.featured)
   if (body.commentsEnabled !== undefined) fields.comments_enabled = Boolean(body.commentsEnabled)
-  if (body.publishedAt !== undefined) fields.published_at = body.publishedAt || null
+  if (body.publishedAt !== undefined) {
+    if (!body.publishedAt) fields.published_at = null
+    else {
+      const date = new Date(body.publishedAt)
+      if (Number.isNaN(date.getTime())) throw new HttpError(422, 'VALIDATION_ERROR', 'Enter a valid publish date and time.')
+      fields.published_at = date.toISOString().slice(0, 19).replace('T', ' ')
+    }
+  }
   if (fields.status === 'published' && !fields.published_at) fields.published_at = new Date().toISOString().slice(0, 19).replace('T', ' ')
   return fields
 }
