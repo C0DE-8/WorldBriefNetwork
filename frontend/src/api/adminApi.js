@@ -1,4 +1,4 @@
-import { api } from '../../api/api.js'
+import { api } from './api.js'
 
 export const getDashboard = () => api('/admin/dashboard')
 export const getAdminStories = () => api('/admin/stories')

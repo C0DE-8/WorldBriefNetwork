@@ -1,10 +1,17 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
-import { stories } from '../src/data/stories.js'
 
 const outputDirectory = resolve('dist')
 const shell = await readFile(resolve(outputDirectory, 'index.html'), 'utf8')
-const publicationDate = '2026-09-15T08:00:00-07:00'
+const apiUrl = (process.env.VITE_API_URL || 'http://localhost:4000/api/v1').replace(/\/$/, '')
+let stories = []
+try {
+  const response = await fetch(`${apiUrl}/stories?limit=100`)
+  if (!response.ok) throw new Error(`API returned ${response.status}`)
+  stories = (await response.json()).data
+} catch (error) {
+  console.warn(`Static article metadata skipped: ${error.message}`)
+}
 
 const escapeHtml = (value) => value
   .replaceAll('&', '&amp;')
@@ -36,8 +43,8 @@ for (const story of stories) {
   html = html.replace(/\s*<meta property="og:image:(?:width|height)"[^>]*>/g, '')
 
   const articleMeta = [
-    `<meta property="article:published_time" content="${publicationDate}" />`,
-    `<meta property="article:modified_time" content="${publicationDate}" />`,
+    `<meta property="article:published_time" content="${story.publishedAt}" />`,
+    `<meta property="article:modified_time" content="${story.publishedAt}" />`,
     `<meta property="article:section" content="${escapeHtml(story.category)}" />`,
     `<meta property="article:author" content="${escapeHtml(story.author)}" />`,
   ].join('\n    ')
@@ -47,8 +54,8 @@ for (const story of stories) {
     headline: story.title,
     description: story.description,
     image: [story.image],
-    datePublished: publicationDate,
-    dateModified: publicationDate,
+    datePublished: story.publishedAt,
+    dateModified: story.publishedAt,
     author: [{ '@type': 'Person', name: story.author }],
     publisher: { '@type': 'Organization', name: 'WorldBriefNetwork' },
     articleSection: story.category,

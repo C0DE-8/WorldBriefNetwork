@@ -1,0 +1,3 @@
+import s from './Pagination.module.css'
+
+export default function Pagination({page,pages,setPage,total,pageSize}){if(total<=pageSize)return null;return <nav className={s.pagination} aria-label="Pagination"><span>Page {page} of {pages} · {total} records</span><div><button disabled={page===1} onClick={()=>setPage(page-1)}>Previous</button>{Array.from({length:pages},(_,index)=>index+1).filter(number=>number===1||number===pages||Math.abs(number-page)<=1).map(number=><button className={number===page?s.active:''} aria-current={number===page?'page':undefined} key={number} onClick={()=>setPage(number)}>{number}</button>)}<button disabled={page===pages} onClick={()=>setPage(page+1)}>Next</button></div></nav>}

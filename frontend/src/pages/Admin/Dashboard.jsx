@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getDashboard } from './adminApi'
+import { getDashboard } from '../../api/adminApi'
 import s from './Admin.module.css'
 
 const total = (items = []) => items.reduce((sum, item) => sum + Number(item.count), 0)

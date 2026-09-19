@@ -1,13 +1,13 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { api } from '../api/api.js'
-import { stories as fallbackStories, categories as fallbackCategories } from '../data/stories'
 
 const ContentContext = createContext(null)
 
 export function ContentProvider({ children }) {
-  const [stories, setStories] = useState(fallbackStories)
-  const [categories, setCategories] = useState(fallbackCategories)
+  const [stories, setStories] = useState([])
+  const [categories, setCategories] = useState([])
   const [backendReady, setBackendReady] = useState(false)
+  const [error, setError] = useState('')
 
   useEffect(() => {
     let current = true
@@ -18,11 +18,13 @@ export function ContentProvider({ children }) {
         setCategories(categoryResponse.data.map((item) => item.name))
         setBackendReady(true)
       })
-      .catch(() => setBackendReady(false))
+      .catch((requestError) => { setBackendReady(false); setError(requestError.message || 'The publication API is unavailable.') })
     return () => { current = false }
   }, [])
 
   const value = useMemo(() => ({ stories, categories, backendReady }), [stories, categories, backendReady])
+  if (error) return <main style={{minHeight:'100vh',display:'grid',placeItems:'center',padding:30,textAlign:'center'}}><div><h1>WorldBriefNetwork is temporarily unavailable.</h1><p>{error}</p><button className="darkButton" onClick={()=>window.location.reload()}>Try again</button></div></main>
+  if (!backendReady) return <main style={{minHeight:'100vh',display:'grid',placeItems:'center'}} aria-live="polite">Loading WorldBriefNetwork…</main>
   return <ContentContext.Provider value={value}>{children}</ContentContext.Provider>
 }
 

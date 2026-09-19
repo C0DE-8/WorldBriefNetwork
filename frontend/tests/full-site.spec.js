@@ -20,7 +20,7 @@ test('reader and administrator critical journeys', async ({ page }) => {
   await page.getByLabel('Password').fill(password)
   await page.getByRole('button', { name: /create account/i }).click()
   const duplicate = page.getByRole('alert')
-  if (await duplicate.isVisible({ timeout: 1500 }).catch(() => false)) {
+  if (await duplicate.isVisible({ timeout: 5000 }).catch(() => false)) {
     await page.goto('/login')
     await page.getByLabel('Email address').fill('8amhabibi@gmail.com')
     await page.getByLabel('Password').fill(password)
@@ -77,7 +77,7 @@ test('reader and administrator critical journeys', async ({ page }) => {
   await page.getByRole('row', { name: temporaryTitle }).getByRole('button', { name: 'Delete' }).click()
   await expect(page.getByText(temporaryTitle)).toHaveCount(0)
 
-  await page.getByRole('link', { name: 'Authors', exact: true }).click()
+  await page.getByRole('link', { name: /Authors/ }).click()
   await expect(page.getByRole('heading', { name: 'Authors' })).toBeVisible()
   await expect(page.getByText('Maya Okafor')).toBeVisible()
   const adminAuthorName=`Test Author ${Date.now()}`

@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { articleBody } from '../../data/stories'
 import { useContent } from '../../context/ContentContext'
 import Icon from '../../components/Icon'
 import StoryCard from '../../components/StoryCard'
@@ -20,7 +19,7 @@ export default function Article({ saved, onSave }) {
     ...stories.filter((item) => item.id !== id && item.category === story.category),
     ...stories.filter((item) => item.id !== id && item.category !== story.category),
   ].slice(0, 5)
-  const paragraphs = articleBody(story)
+  const paragraphs = Array.isArray(story.body) ? story.body : []
   const published = story.publishedAt ? new Date(story.publishedAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) : ''
 
   async function share() {

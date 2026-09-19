@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { createStory, getAdminStory, getStoryOptions, saveStory, uploadStoryImage } from './adminApi'
+import { createStory, getAdminStory, getStoryOptions, saveStory, uploadStoryImage } from '../../api/adminApi'
 import s from './Admin.module.css'
 import e from './StoryEditor.module.css'
 
