@@ -19,6 +19,7 @@ module.exports = {
   port: Number(process.env.PORT || 4000),
   frontendUrl: frontendUrls[0],
   frontendUrls,
+  sessionCookieSameSite: production ? 'none' : 'lax',
   jwtSecret: process.env.JWT_SECRET || (production ? '' : 'development-only-secret-change-before-production'),
   sessionDays: Number(process.env.SESSION_DAYS || 30),
   db: {

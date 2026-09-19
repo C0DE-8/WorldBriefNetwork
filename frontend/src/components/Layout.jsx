@@ -39,11 +39,11 @@ export default function Layout({ saved }) {
             </div>}
           </div> : <Link className={s.signIn} to="/login"><Icon name="user" size={16} /> Sign in</Link>}
           <Link to="/newsletter" className="darkButton">The daily brief <Icon name="arrow" size={15} /></Link>
-          <button className={s.menuButton} aria-label="Toggle navigation" aria-expanded={menu} onClick={() => setMenu(!menu)}><Icon name={menu ? 'close' : 'menu'} /></button>
+          <button className={s.menuButton} aria-label="Toggle navigation" aria-controls="main-navigation" aria-expanded={menu} onClick={() => setMenu(!menu)}><Icon name={menu ? 'close' : 'menu'} /></button>
         </div>
       </div>
       {search && <form className={s.search} onSubmit={(event) => { event.preventDefault(); navigate(`/search?q=${encodeURIComponent(event.currentTarget.query.value)}`); setSearch(false) }}><Icon name="search" /><input name="query" autoFocus required placeholder="What are you curious about?" aria-label="Search stories" /><button className="darkButton">Search <Icon name="right" /></button></form>}
-      <nav className={`${s.nav} ${menu ? s.open : ''}`} aria-label="Main navigation"><div><NavLink to="/" end onClick={() => setMenu(false)}>Home</NavLink>{categories.map((category) => <NavLink to={`/category/${category.toLowerCase()}`} key={category} onClick={() => setMenu(false)}>{category}</NavLink>)}<NavLink to="/about" onClick={() => setMenu(false)}>About us <Icon name="down" size={12} /></NavLink></div><Link to="/trending" className={s.trending}><span /> Trending now <Icon name="arrow" size={13} /></Link></nav>
+      <nav id="main-navigation" className={`${s.nav} ${menu ? s.open : ''}`} aria-label="Main navigation"><div><NavLink to="/" end onClick={() => setMenu(false)}>Home</NavLink>{categories.map((category) => <NavLink to={`/category/${category.toLowerCase()}`} key={category} onClick={() => setMenu(false)}>{category}</NavLink>)}<NavLink to="/about" onClick={() => setMenu(false)}>About us <Icon name="down" size={12} /></NavLink></div><Link to="/trending" className={s.trending}><span /> Trending now <Icon name="arrow" size={13} /></Link></nav>
     </header>
     <main id="main" className={s.main}><Outlet /></main>
     <footer className={s.footer}>

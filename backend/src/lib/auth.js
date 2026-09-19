@@ -15,7 +15,7 @@ async function createSession(res, user, req) {
      VALUES (?, ?, ?, ?, ?, DATE_ADD(UTC_TIMESTAMP(), INTERVAL ? DAY))`,
     [sessionId, user.id, tokenHash(token), req.get('user-agent') || null, tokenHash(req.ip || ''), config.sessionDays],
   )
-  res.cookie(COOKIE, token, { httpOnly: true, secure: config.production, sameSite: 'lax', maxAge: config.sessionDays * 86400000, path: '/' })
+  res.cookie(COOKIE, token, { httpOnly: true, secure: config.production, sameSite: config.sessionCookieSameSite, maxAge: config.sessionDays * 86400000, path: '/' })
 }
 
 async function resolveUser(req) {

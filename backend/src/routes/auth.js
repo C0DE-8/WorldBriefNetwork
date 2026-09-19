@@ -1,6 +1,7 @@
 const crypto = require('node:crypto')
 const express = require('express')
 const bcrypt = require('bcryptjs')
+const config = require('../config')
 const { pool } = require('../db')
 const { asyncRoute, HttpError, ok } = require('../lib/http')
 const { COOKIE, createSession, tokenHash, requireAuth } = require('../lib/auth')
@@ -47,7 +48,7 @@ router.post('/login', asyncRoute(async (req, res) => {
 
 router.post('/logout', requireAuth, asyncRoute(async (req, res) => {
   await pool.execute('UPDATE auth_sessions SET revoked_at=UTC_TIMESTAMP() WHERE id=?', [req.user.sessionId])
-  res.clearCookie(COOKIE, { path: '/' })
+  res.clearCookie(COOKIE, { path: '/', secure: config.production, sameSite: config.sessionCookieSameSite })
   ok(res, { success: true })
 }))
 
